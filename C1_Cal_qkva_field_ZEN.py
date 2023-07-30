@@ -181,18 +181,3 @@ def cal_qkva_field(trajectory_data,delta_t=50,delta_x=300,t_step=20,x_step=20,pl
         acc_field = cal_acc_field(speed_field)               
         m_p = macro_para
     return m_p
-
-# a = np.full([len(ka),], np.nan)
-# for i in np.arange(len(ka)):
-#     # print(i)
-#     try:
-#         a[i] = ka[i][0]
-#     except:
-#         try:
-#             a[i] = ka[i]
-#         except:
-#             a[i] = np.nan
-#     if i%10000 == 0:
-#         print(i)
-    
-# m_p['ka'] = a
