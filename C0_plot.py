@@ -14,44 +14,30 @@ plt.rc('font',family='Times New Roman')
 plt.rcParams['font.size'] = 30
 
 
-# data = np.random.rand(10, 10)
+data = np.random.rand(10, 10)
+# 绘制现有色条
+plt.figure()
+cax = plt.imshow(data, cmap='jet')
+colorbar = plt.colorbar(cax)
 
-# # 绘制现有色条
+# 获取现有色条的颜色映射对象
+cmap = colorbar.mappable.get_cmap()
+
+# 选择色条的一部分
+vmin = -0.4  # 色条起始位置的值
+vmax = 1.4  # 色条结束位置的值
+norm = plt.Normalize(vmin=vmin, vmax=vmax)
+new_cmap = mcolors.LinearSegmentedColormap.from_list('custom_cmap', cmap(norm(np.linspace(0, 1, 256))))
+
+# 创建自定义的色条对象
+custom_cmap = mcolors.ListedColormap(new_cmap(np.arange(new_cmap.N)))
+
+# # 使用自定义的色条对象绘制图像
 # plt.figure()
-# cax = plt.imshow(data, cmap='jet')
-# colorbar = plt.colorbar(cax)
+# plt.imshow(data, cmap=custom_cmap)
+# plt.colorbar()
 
-# # 获取现有色条的颜色映射对象
-# cmap = colorbar.mappable.get_cmap()
-
-# # 选择色条的一部分
-# vmin = -0.4  # 色条起始位置的值
-# vmax = 1.4  # 色条结束位置的值
-# norm = plt.Normalize(vmin=vmin, vmax=vmax)
-# new_cmap = mcolors.LinearSegmentedColormap.from_list('custom_cmap', cmap(norm(np.linspace(0, 1, 256))))
-
-# # 创建自定义的色条对象
-# custom_cmap = mcolors.ListedColormap(new_cmap(np.arange(new_cmap.N)))
-
-# # # 使用自定义的色条对象绘制图像
-# # plt.figure()
-# # plt.imshow(data, cmap=custom_cmap)
-# # plt.colorbar()
-
-# # plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-
+# plt.show()
 
 
 def extract_bi_data(data,r=0,shuffle=True):
@@ -158,79 +144,78 @@ def draw_fields(macro_para,xup=3500,tdw=0,tup=3500,xdw=0,subplot=False,kv_FD=Fal
     m_p = macro_para[(macro_para['x']>xdw)&(macro_para['x']<xup)&(macro_para['t']<tup)&(macro_para['t']>=tdw)]
     m_p['x'] = m_p['x']/100
     
-    # 二分类数据
-    f10 = get_fig((12,8))
-    bi_data = extract_bi_data(m_p,r=0,shuffle=True)
-    plt.scatter(100,50,c=custom_cmap(0))
-    plt.scatter(100,50,c=custom_cmap(0.9999))
-    plt.scatter(bi_data['ka']*1000,bi_data['v(km/h)'],c=bi_data['label'],cmap=custom_cmap)
-    plt.legend(['Accelerate sample','Decelerate sample'],fontsize=35)
-    spatial_temporal_fig_set(xlabel='Anticipated density (veh/km)',ylabel='Speed (km/h)',cblabel='Acceleration (m/s^2)',labelsize=50,ticksize=40,inverse=False,cbar=False)
-    
-    
     if subplot:
         fig = get_fig((16,12))
         plt.subplot(2,2,1)
         plt.scatter(m_p['k']*1000,m_p['v(km/h)'],c=m_p['acc'],alpha=0.1,cmap='jet_r')
-        spatial_temporal_fig_set(xlabel='Density (veh/km)',ylabel='Speed (km/h)',cblabel='Acceleration (m/s^2)',labelsize=35,ticksize=30,inverse=False,cbar=True)
+        spatial_temporal_fig_set(xlabel='Density (veh/km)',ylabel='Speed (km/h)',cblabel='Acceleration (m/s^2)',labelsize=30,ticksize=25,inverse=False,cbar=True)
     else:
-        # 速度密度基本图
-        if kv_FD:
-            print('Drawing kv_FD...')
-            f1 = get_fig((14,8))
-            plt.scatter(m_p['k']*1000,m_p['v(km/h)'],c=m_p['acc'],alpha=0.1,cmap='jet_r')
-            spatial_temporal_fig_set(xlabel='Density (veh/km)',ylabel='Speed (km/h)',cblabel='Acceleration (m/s^2)',labelsize=50,ticksize=40,inverse=False,cbar=True)
-            print('Done!')
         # 流量密度基本图
-        if kq_FD:
-            print('Drawing kq_FD...')
-            # f2 = get_fig((14,8))
-            # plt.scatter(m_p['k']*1000,m_p['q']*3600,c=m_p['acc'],alpha=0.1,cmap='jet_r')
-            # spatial_temporal_fig_set(xlabel='Density (veh/km)',ylabel='volume (veh/h)',cblabel='Acceleration (m/s^2)',labelsize=35,ticksize=30,inverse=False,cbar=True)
-            print('Done!')
+        # if kq_FD:
+        #     print('Drawing kq_FD...')
+        #     f2 = get_fig((14,8))
+        #     plt.scatter(m_p['k']*1000,m_p['q']*3600,c=m_p['acc'],alpha=0.1,cmap='jet_r')
+        #     spatial_temporal_fig_set(xlabel='Density (veh/km)',ylabel='volume (veh/h)',cblabel='Acceleration (m/s^2)',labelsize=35,ticksize=30,inverse=False,cbar=True)
+        #     print('Done!')
         # 速度场
         if speed_f:
-            print('Drawing speed_field...')
-            f3 = get_fig((14,8))
+            # print('Drawing speed_field...')
+            f3 = get_fig((8,5))
             plt.scatter(m_p['t'],m_p['x'],c=m_p['v(km/h)'],cmap='jet_r')
             plt.xlim(min(m_p['t']),max(m_p['t']))
             plt.ylim(min(m_p['x']),max(m_p['x']))
-            spatial_temporal_fig_set(xlabel='Time (s)',ylabel='Kilopost (100 m)',cblabel='Speed (km/h)',labelsize=50,ticksize=40,inverse=invs,cbar=True)
-            print('Done!')
+            spatial_temporal_fig_set(xlabel='Time (s)',ylabel='Kilopost (100 m)',cblabel='Speed (km/h)',labelsize=30,ticksize=25,inverse=invs,cbar=True)
+            # print('Done!')
         # 流量场
-        if volume_f:
-            print('Drawing volume_field...')
-            # f4 = get_fig((14,8))
-            # plt.scatter(m_p['t'],m_p['x'],c=m_p['q']*3600,cmap='jet')
-            # plt.xlim(min(m_p['t']),max(m_p['t']))
-            # plt.ylim(min(m_p['x']),max(m_p['x']))
-            # spatial_temporal_fig_set(xlabel='Time (s)',ylabel='Kilopost (100 m)',cblabel='Volume (veh/h)',labelsize=50,ticksize=40,inverse=invs,cbar=True)
-            print('Done!')
+        # if volume_f:
+        #     print('Drawing volume_field...')
+        #     f4 = get_fig((14,8))
+        #     plt.scatter(m_p['t'],m_p['x'],c=m_p['q']*3600,cmap='jet')
+        #     plt.xlim(min(m_p['t']),max(m_p['t']))
+        #     plt.ylim(min(m_p['x']),max(m_p['x']))
+        #     spatial_temporal_fig_set(xlabel='Time (s)',ylabel='Kilopost (100 m)',cblabel='Volume (veh/h)',labelsize=50,ticksize=40,inverse=invs,cbar=True)
+        #     print('Done!')
         # 密度场
         if density_f:
-            print('Drawing density_field...')
-            f5 = get_fig((14,8))
+            # print('Drawing density_field...')
+            f5 = get_fig((8,5))
             plt.scatter(m_p['t'],m_p['x'],c=m_p['k']*1000,cmap='jet')
             plt.xlim(min(m_p['t']),max(m_p['t']))
             plt.ylim(min(m_p['x']),max(m_p['x']))
-            spatial_temporal_fig_set(xlabel='Time (s)',ylabel='Kilopost (100 m)',cblabel='Density (veh/km)',labelsize=50,ticksize=40,inverse=invs,cbar=True)
-            print('Done!')
+            spatial_temporal_fig_set(xlabel='Time (s)',ylabel='Kilopost (100 m)',cblabel='Density (veh/km)',labelsize=30,ticksize=25,inverse=invs,cbar=True)
+            # print('Done!')
         # 加速度场
         if acc_f:
-            print('Drawing acc_field...')
-            f6 = get_fig((14,8))
+            # print('Drawing acc_field...')
+            f6 = get_fig((8,5))
             plt.scatter(m_p['t'],m_p['x'],c=m_p['acc'],cmap='jet_r')       # 速度场
             plt.xlim(min(m_p['t']),max(m_p['t']))
             plt.ylim(min(m_p['x']),max(m_p['x']))
-            spatial_temporal_fig_set(xlabel='Time (s)',ylabel='Kilopost (100 m)',cblabel='Acceleration (m/s^2)',labelsize=50,ticksize=40,inverse=invs,cbar=True)
-            print('Done!')
+            spatial_temporal_fig_set(xlabel='Time (s)',ylabel='Kilopost (100 m)',cblabel='Acceleration (m/s^2)',labelsize=30,ticksize=25,inverse=invs,cbar=True)
+            # print('Done!')
+        # 速度密度基本图
+        if kv_FD:
+            # print('Drawing kv_FD...')
+            f1 = get_fig((8,5))
+            plt.scatter(m_p['k']*1000,m_p['v(km/h)'],c=m_p['acc'],alpha=0.1,cmap='jet_r')
+            spatial_temporal_fig_set(xlabel='Density (veh/km)',ylabel='Speed (km/h)',cblabel='Acceleration (m/s^2)',labelsize=30,ticksize=25,inverse=False,cbar=True)
+            # print('Done!')
         # 密度偏移后的kv FD
         if density_a_kv:
-            print('Drawing KaV-FD...')
-            f7 = get_fig((14,8))
+            # print('Drawing KaV-FD...')
+            f7 = get_fig((8,5))
             plt.scatter(m_p['ka']*1000,m_p['v(km/h)'],c=m_p['acc'],alpha=0.1,cmap='jet_r')
-            spatial_temporal_fig_set(xlabel='Anticipated density (veh/km)',ylabel='Speed (km/h)',cblabel='Acceleration (m/s^2)',labelsize=50,ticksize=40,inverse=False,cbar=True)
+            spatial_temporal_fig_set(xlabel='Anticipated density (veh/km)',ylabel='Speed (km/h)',cblabel='Acceleration (m/s^2)',labelsize=30,ticksize=25,inverse=False,cbar=True)
             print('Done!')
+        # NLKV
+        f10 = get_fig((8,5))
+        bi_data = extract_bi_data(m_p,r=0,shuffle=True)
+        plt.scatter(100,50,c=custom_cmap(0))
+        plt.scatter(100,50,c=custom_cmap(0.9999))
+        plt.scatter(bi_data['ka']*1000,bi_data['v(km/h)'],c=bi_data['label'],cmap=custom_cmap)
+        plt.legend(['Accelerate sample','Decelerate sample'],fontsize=25)
+        spatial_temporal_fig_set(xlabel='Anticipated density (veh/km)',ylabel='Speed (km/h)',cblabel='y',labelsize=30,ticksize=25,inverse=False,cbar=False)
+            
             # print('Drawing KaV-FD classify...')
             # f8 = get_fig((14,8))
             # eps_a = 0.6
@@ -248,68 +233,9 @@ def draw_fields(macro_para,xup=3500,tdw=0,tup=3500,xdw=0,subplot=False,kv_FD=Fal
             # spatial_temporal_fig_set(xlabel='Anticipated density (veh/km)',ylabel='Speed (km/h)',cblabel='Acceleration (m/s^2)',labelsize=35,ticksize=30,inverse=False,cbar=False)
             # print('Done!')
         # 密度偏移后的kq FD
-        if density_a_kq:
-            print('Drawing KaQ-FD...')
-            # f9 = get_fig((14,8))
-            # plt.scatter(m_p['ka']*1000,m_p['q']*3600,c=m_p['acc'],alpha=0.1,cmap='jet_r')
-            # spatial_temporal_fig_set(xlabel='Anticipated density',ylabel='volume (veh/h)',cblabel='Acceleration (m/s^2)',labelsize=35,ticksize=30,inverse=False,cbar=True)
-            print('Done!')
-
-    
-    
-
-
-
-
-def plt_FD_section(macro_para,x=4400.8,a_area=[-0.5,0.5]):
-    f = get_fig((14,8))
-    m_p = macro_para[(macro_para['x']>3500)&(macro_para['t']<3500)]
-    if x:
-        dt = m_p[m_p['x']==x]
-    else:
-        dt = m_p
-    if a_area:
-        print('acc_area = '+str(a_area))
-        dt1 = dt[(dt['acc']>a_area[0])&(dt['acc']<a_area[1])]
-        plt.scatter(dt['k']*1000,dt['v(km/h)'],c=dt['acc'],cmap='gray')
-        plt.colorbar()
-        plt.scatter(dt1['k']*1000,dt1['v(km/h)'],c='r',edgecolors='w')
-        f1 = get_fig((14,8))
-        plt.scatter(dt['k']*1000,dt['q']*3600,c=dt['acc'],cmap='gray')
-        plt.colorbar()
-        plt.scatter(dt1['k']*1000,dt1['q']*3600,c='r',edgecolors='w')
-    else:
-        plt.scatter(dt['k']*1000,dt['v(km/h)'],c=dt['acc'],cmap='jet_r')
-        plt.colorbar()
-        f1 = get_fig((14,8))
-        plt.scatter(dt['k']*1000,dt['q']*3600,c=dt['acc'],cmap='jet_r')
-        plt.colorbar()
-
-def plt_FD_second(macro_para,t=1200,a_area=[-0.5,0.5]):
-    f = get_fig((14,8))
-    m_p = macro_para[(macro_para['x']>3500)&(macro_para['t']<3500)]
-    dt = m_p[m_p['t']==t]
-    if a_area:
-        print('acc_area = '+str(a_area))
-        dt = dt[(dt['acc']>a_area[0])&(dt['acc']<a_area[1])]
-        plt.scatter(dt['k']*1000,dt['v(km/h)'],c=dt['acc'],cmap='jet_r')
-        plt.colorbar()
-    else:
-        plt.scatter(dt['k']*1000,dt['v(km/h)'],c=dt['acc'],cmap='jet_r')
-        plt.colorbar()
-        f1 = get_fig((14,8))
-        plt.scatter(dt['k']*1000,dt['q']*3600,c=dt['acc'],cmap='jet_r')
-        plt.colorbar()
-    
-def plt_3D_st_para(macro_para,para='v_var'):
-    m_p = macro_para[(macro_para['x']>3500)&(macro_para['t']<3500)]
-    f = get_fig((14,8))
-    ax = Axes3D(f)
-    
-    f1 = ax.scatter3D(m_p['x'],m_p['t'],m_p[para])
-    
-
-    
-
-
-
+        # if density_a_kq:
+        #     print('Drawing KaQ-FD...')
+        #     f9 = get_fig((14,8))
+        #     plt.scatter(m_p['ka']*1000,m_p['q']*3600,c=m_p['acc'],alpha=0.1,cmap='jet_r')
+        #     spatial_temporal_fig_set(xlabel='Anticipated density',ylabel='volume (veh/h)',cblabel='Acceleration (m/s^2)',labelsize=35,ticksize=30,inverse=False,cbar=True)
+        #     print('Done!')

@@ -14,7 +14,6 @@ plt.rcParams['font.size'] = 20
 
 def load_data(file_name,plot_figure=False,sp_lane=False,inverse=True,cbar=True):
     '''加载数据集,支持速度时空图可视化'''
-    trajectory_list = []
     col_name = ['veh_id','datetime','veh_type','velocity','traffic_lane','lng','lat','kilopost','veh_len','detected_flag']
     tra_dt = pd.read_csv(file_name,header=None)
     tra_dt.columns = col_name
@@ -55,10 +54,9 @@ def load_data(file_name,plot_figure=False,sp_lane=False,inverse=True,cbar=True):
             d3_fig_set(xlabel='lane',ylabel='Time (s)',zlabel='Kilopost (m)',cblabel='Velocity (km/h)',f=f,ax=ax,labelsize=30,ticksize=25,inverse=inverse,cbar=cbar)
         else:
             fig = get_fig((24,8))
-            plt.scatter(tra_data['rtime'],tra_data['kilopost'],c=tra_data['velocity'],cmap='jet_r')
+            plt.scatter(tra_data['rtime'],tra_data['kilopost'],c=tra_data['velocity'],cmap='jet_r',s=1)
             plt.xlim(min(tra_data['rtime']),max(tra_data['rtime']))
             plt.ylim(min(tra_data['kilopost']),max(tra_data['kilopost']))
             spatial_temporal_fig_set(xlabel='Time (s)',ylabel='Kilopost (m)',cblabel='Velocity (km/h)',labelsize=30,ticksize=25,inverse=inverse,cbar=cbar)
         break
-    trajectory_list.append(tra_data)
-    return trajectory_list
+    return tra_data
