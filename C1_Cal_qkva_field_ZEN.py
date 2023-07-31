@@ -70,8 +70,8 @@ def cal_DSD(macro_para,t_step,x_increase=True):
     i = 0
     for data in m:
         i += 1
-        if i%1000==0:
-            print(i)
+        # if i%1000==0:
+        #     print(i)
         if (data[1]<=up)&(data[1]>=low):
             kai = macro_para[(macro_para['t']==data[0])&(macro_para['x']>data[1]-0.1)&(macro_para['x']<data[1]+0.1)]['k']
             ka.append(kai.values)
@@ -88,8 +88,8 @@ def cal_DSD(macro_para,t_step,x_increase=True):
                 a[i] = ka[i]
             except:
                 a[i] = np.nan
-        if i%10000 == 0:
-            print(i)
+        # if i%10000 == 0:
+        #     print(i)
         
     macro_para['ka'] = a
     
